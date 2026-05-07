@@ -11,19 +11,23 @@ import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
 
+// Spring-WS тохиргоо: SOAP endpoint болон WSDL үүсгэнэ
 @EnableWs
 @Configuration
 public class SoapConfig {
 
+    // SOAP хүсэлтүүдийг боловсруулах servlet-ийг /ws/* замд бүртгэнэ
     @Bean
     public ServletRegistrationBean<MessageDispatcherServlet> messageDispatcherServlet(
             ApplicationContext context) {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
         servlet.setApplicationContext(context);
+        // WSDL доторх хаягийг хүсэлтийн URL-д тааруулж өөрчилнө
         servlet.setTransformWsdlLocations(true);
         return new ServletRegistrationBean<>(servlet, "/ws/*");
     }
 
+    // WSDL тодорхойлолт — /ws/auth.wsdl хаягаар хандах боломжтой
     @Bean(name = "auth")
     public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema authSchema) {
         DefaultWsdl11Definition definition = new DefaultWsdl11Definition();
@@ -34,6 +38,7 @@ public class SoapConfig {
         return definition;
     }
 
+    // auth.xsd файлаас schema уншина
     @Bean
     public XsdSchema authSchema() {
         return new SimpleXsdSchema(new ClassPathResource("auth.xsd"));
