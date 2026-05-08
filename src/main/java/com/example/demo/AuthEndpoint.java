@@ -100,15 +100,16 @@ public class AuthEndpoint {
 
         try {
             String decoded = new String(Base64.getDecoder().decode(request.getToken()));
-            String[] parts = decoded.split(":");
-
-            if (parts.length != 3) {
+            // Split on first and last colon so usernames containing ':' are handled correctly
+            int firstColon = decoded.indexOf(':');
+            int lastColon = decoded.lastIndexOf(':');
+            if (firstColon < 0 || firstColon == lastColon) {
                 response.setValid(false);
                 return response;
             }
 
-            Long userId = Long.parseLong(parts[0]);
-            String username = parts[1];
+            Long userId = Long.parseLong(decoded.substring(0, firstColon));
+            String username = decoded.substring(firstColon + 1, lastColon);
 
             Optional<User> userOpt = userRepository.findById(userId);
 
